@@ -1,8 +1,6 @@
 package com.juan.prueba.git.controller;
 
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.PushCommand;
@@ -23,12 +21,9 @@ import org.eclipse.jgit.api.errors.UnmergedPathsException;
 import org.eclipse.jgit.api.errors.WrongRepositoryStateException;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.transport.JschConfigSessionFactory;
-import org.eclipse.jgit.transport.OpenSshConfig;
 import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.transport.Transport;
-import org.eclipse.jgit.util.FS;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -39,15 +34,19 @@ import java.util.Collection;
 import java.util.Date;
 
 public class GitHelper {
-    private static final String SSH_PRIVATE_FILE_PATH = "/Users/ff_465juan/Documents/git-ssh";
-    private static final String SSH_PASSWORD = "developer";
     private static final String SSH_GIT_URI = "git@github.com:jranukss/reportsTest.git";
     private static final String LOCAL_REPOSITORY_PATH = "/Users/ff_465juan/Documents/prueba/test2";
 
     public static void main(String[] args)
             throws InvalidRemoteException, TransportException, GitAPIException, IOException {
 
-         saveNewFile("lastReport.json", "contenido de lstReport.json");
+         
+         cloneRemoteRepository();
+
+
+         saveNewFile("multiTesting2.json", "contenido de lstReport.json");
+
+         saveNewFile("another multiTesting2.json", "contenido de lstReport.json");
 
     }
 
@@ -183,24 +182,17 @@ public class GitHelper {
     }
 
     private static class SshTransportConfigCallback implements TransportConfigCallback {
-        private final SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
-            @Override
-            protected void configure(OpenSshConfig.Host hc, Session session) {
-                session.setConfig("StrictHostKeyChecking", "no");
-            }
-
-            @Override
-            protected JSch createDefaultJSch(FS fs) throws JSchException {
-                JSch jSch = super.createDefaultJSch(fs);
-                jSch.addIdentity(SSH_PRIVATE_FILE_PATH, SSH_PASSWORD.getBytes());
-                return jSch;
-            }
-        };
+      
 
         @Override
         public void configure(Transport transport) {
             SshTransport sshTransport = (SshTransport) transport;
-            sshTransport.setSshSessionFactory(sshSessionFactory);
+
+            SshSessionFactory sessionFactory = SshSessionFactory.getInstance();
+            
+            sshTransport.setSshSessionFactory(sessionFactory);
+
+          
         }
     }
 
